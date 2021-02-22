@@ -8,8 +8,10 @@ import Data.Maybe   (fromJust)
 
 import BingoEngine
 
-
-type Action = Int 
+-- To play game:
+-- ghci
+-- :l PlayBingo
+-- start
 
 -- Game state is a tuple containing record of selected numbers/dice rolls of each player. 
 -- First element in the tuple is computer's record, second element is player's record
@@ -63,7 +65,6 @@ person_play state numselection whostart =
         if numpicked == "x"
           then exit
         else
-          --let action = (readMaybe numpicked :: Maybe Action) in
           if (not(numpicked `elem` ["1","2","3","4","5","6"]))
             then person_play state numselection whostart
           else
