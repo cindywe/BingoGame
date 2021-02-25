@@ -11,8 +11,7 @@ import BingoEngine
 import BingoDice
 
 -- To play game:
--- cabal install --lib random,containers
--- ghci
+-- cabal repl -b random,containers
 -- :l PlayBingo
 -- start
 
