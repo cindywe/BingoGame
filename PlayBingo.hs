@@ -62,7 +62,7 @@ person_play state numselection whostart =
         putStrLn ("Computer's matched: " ++ show computermatchedcells)
         putStrLn ("--------------------------")
         putStrLn ("# selection remains: " ++ show numselection)
-        putStrLn ("t = toss the dice | x = exit game")
+        putStrLn ("t = toss the dice | p = pick a number manually from [1-6] | x = exit game")
         isToss <- getLine
         if isToss == "x"
           then exit
@@ -74,6 +74,9 @@ person_play state numselection whostart =
               let newState = (computerstate, playerstate ++ [numTossed]) 
                in computer_play newState (numselection-1) whostart
           else
+            if isToss == "p"
+              then 
+                if
             person_play state numselection whostart
           -- if (not(numpicked `elem` ["1","2","3","4","5","6"]))
           --   then 
