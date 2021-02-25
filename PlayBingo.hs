@@ -69,15 +69,20 @@ person_play state numselection whostart =
           then exit
         else
           if isToss == "t"
-            then do numTossed <- rollADice 
-              
-            
-          if (not(numpicked `elem` ["1","2","3","4","5","6"]))
-            then person_play state numselection whostart
+            then do 
+              numTossed <- rollADice -- result of roll a dice
+              putStrLn ("You tossed "++show numTossed)
+              let newState = (computerstate, playerstate ++ [numTossed]) 
+               in computer_play newState (numselection-1) whostart
           else
-            let numpickedint = read numpicked :: Int
-                newState = (computerstate, playerstate ++ [numpickedint])
-            in computer_play newState (numselection-1) whostart
+            person_play state numselection whostart
+          -- if (not(numpicked `elem` ["1","2","3","4","5","6"]))
+          --   then 
+            
+          -- else
+          --   let numpickedint = read numpicked :: Int
+          --       newState = (computerstate, playerstate ++ [numpickedint])
+          --   in computer_play newState (numselection-1) whostart
     
 
 
@@ -89,11 +94,10 @@ computer_play state numselection whostart =
     if(whostart == "c" && numselection <= 0)
       then endgame state
     else
-      -- TODO: update to random number
       do
-        putStrLn ("Computer picks "++show 3)
-
-        let newState = (computerstate ++ [3], playerstate)
+        numTossed <- rollADice -- result of roll a dice
+        putStrLn ("Computer tossed "++show numTossed)
+        let newState = (computerstate ++ [numTossed], playerstate)
         person_play newState numselection whostart
 
 
