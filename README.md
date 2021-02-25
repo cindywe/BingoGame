@@ -4,6 +4,6 @@ This is the project 1 Bingo Game for CPSC312 in UBC. It is designed to investiga
 
 
 To play the game:
-- cabal install --lib random,containers
+- cabal repl -b random,containers
 - :l PlayBingo
 - start
