@@ -8,7 +8,10 @@ import Data.Maybe   (fromJust)
 
 import BingoEngine
 
+import BingoDice
+
 -- To play game:
+-- cabal install --lib random,containers
 -- ghci
 -- :l PlayBingo
 -- start
@@ -32,7 +35,7 @@ play state =
       then play state
     else
       do
-        let numselectionint = read numselection :: Int
+        let numselectionint = read numselection :: Int -- how many rounds
         putStrLn ("Who starts? y = you | c = computer | other key = exit game")
         whostart <- getLine
         if whostart == "y"
@@ -47,7 +50,7 @@ person_play state numselection whostart =
   do
     let playerstate = snd state
         computerstate = fst state
-        playermatchedcells = getMatchedCells playerstate
+        playermatchedcells = getMatchedCells playerstate -- here get MatchedCells calls BingoEngue
         computermatchedcells = getMatchedCells computerstate
     if(whostart == "y" && numselection <= 0)
       then endgame state
@@ -60,11 +63,15 @@ person_play state numselection whostart =
         putStrLn ("Computer's matched: " ++ show computermatchedcells)
         putStrLn ("--------------------------")
         putStrLn ("# selection remains: " ++ show numselection)
-        putStrLn ("Select a number from 1 - 6 | x = exit game")
-        numpicked <- getLine
-        if numpicked == "x"
+        putStrLn ("t = toss the dice | x = exit game")
+        isToss <- getLine
+        if isToss == "x"
           then exit
         else
+          if isToss == "t"
+            then do numTossed <- rollADice 
+              
+            
           if (not(numpicked `elem` ["1","2","3","4","5","6"]))
             then person_play state numselection whostart
           else
