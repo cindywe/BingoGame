@@ -72,6 +72,9 @@ person_play state numselection whostart =
               let newState = (computerstate, playerstate ++ [numTossed]) 
                in computer_play newState (numselection-1) whostart
           else
+            if isToss == "p"
+              then 
+                if
             person_play state numselection whostart
           -- if (not(numpicked `elem` ["1","2","3","4","5","6"]))
           --   then 
