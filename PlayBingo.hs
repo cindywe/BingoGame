@@ -8,7 +8,10 @@ import Data.Maybe   (fromJust)
 
 import BingoEngine
 
+import BingoDice
+
 -- To play game:
+-- cabal install --lib random,containers
 -- ghci
 -- :l PlayBingo
 -- start
@@ -32,7 +35,7 @@ play state =
       then play state
     else
       do
-        let numselectionint = read numselection :: Int
+        let numselectionint = read numselection :: Int -- how many rounds
         putStrLn ("Who starts? y = you | c = computer | other key = exit game")
         whostart <- getLine
         if whostart == "y"
@@ -47,7 +50,7 @@ person_play state numselection whostart =
   do
     let playerstate = snd state
         computerstate = fst state
-        playermatchedcells = getMatchedCells playerstate
+        playermatchedcells = getMatchedCells playerstate -- here get MatchedCells calls BingoEngue
         computermatchedcells = getMatchedCells computerstate
     if(whostart == "y" && numselection <= 0)
       then endgame state
@@ -60,17 +63,26 @@ person_play state numselection whostart =
         putStrLn ("Computer's matched: " ++ show computermatchedcells)
         putStrLn ("--------------------------")
         putStrLn ("# selection remains: " ++ show numselection)
-        putStrLn ("Select a number from 1 - 6 | x = exit game")
-        numpicked <- getLine
-        if numpicked == "x"
+        putStrLn ("t = toss the dice | x = exit game")
+        isToss <- getLine
+        if isToss == "x"
           then exit
         else
-          if (not(numpicked `elem` ["1","2","3","4","5","6"]))
-            then person_play state numselection whostart
+          if isToss == "t"
+            then do 
+              numTossed <- rollADice -- result of roll a dice
+              putStrLn ("You tossed "++show numTossed)
+              let newState = (computerstate, playerstate ++ [numTossed]) 
+               in computer_play newState (numselection-1) whostart
           else
-            let numpickedint = read numpicked :: Int
-                newState = (computerstate, playerstate ++ [numpickedint])
-            in computer_play newState (numselection-1) whostart
+            person_play state numselection whostart
+          -- if (not(numpicked `elem` ["1","2","3","4","5","6"]))
+          --   then 
+            
+          -- else
+          --   let numpickedint = read numpicked :: Int
+          --       newState = (computerstate, playerstate ++ [numpickedint])
+          --   in computer_play newState (numselection-1) whostart
     
 
 
@@ -82,11 +94,10 @@ computer_play state numselection whostart =
     if(whostart == "c" && numselection <= 0)
       then endgame state
     else
-      -- TODO: update to random number
       do
-        putStrLn ("Computer picks "++show 3)
-
-        let newState = (computerstate ++ [3], playerstate)
+        numTossed <- rollADice -- result of roll a dice
+        putStrLn ("Computer tossed "++show numTossed)
+        let newState = (computerstate ++ [numTossed], playerstate)
         person_play newState numselection whostart
 
 
