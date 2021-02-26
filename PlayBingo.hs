@@ -59,8 +59,8 @@ person_play state numselection whostart =
         putStrLn (get_player_state_string playerstate playermatchedcells)
         putStrLn (get_computer_state_string computerstate computermatchedcells)
         putStrLn ("--------------------------")
-        putStrLn ("# round remains: " ++ show numselection)
-        putStrLn ("t = toss the dice | x = exit game")
+        putStrLn ("# selection remains: " ++ show numselection)
+        putStrLn ("t = toss the dice | p = pick a number manually from [1-6] | x = exit game")
         isToss <- getLine
         if isToss == "x"
           then exit
@@ -116,6 +116,9 @@ endgame state =
     putStrLn (show (getCondsStringByRow 1))
     putStrLn (show (getCondsStringByRow 2))
     putStrLn (show (getCondsStringByRow 3))
+    putStrLn ("================================")
+    putStrLn ("Here is the Bingo Card you played")
+    putStrLn (bingoCard)
     putStrLn ("================================")
     putStrLn ("Here is the Bingo Card you played")
     putStrLn (bingoCard)
