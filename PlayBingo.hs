@@ -59,8 +59,8 @@ person_play state numselection whostart =
         putStrLn (get_player_state_string playerstate playermatchedcells)
         putStrLn (get_computer_state_string computerstate computermatchedcells)
         putStrLn ("--------------------------")
-        putStrLn ("# round remains: " ++ show numselection)
-        putStrLn ("t = toss the dice | x = exit game")
+        putStrLn ("# selection remains: " ++ show numselection)
+        putStrLn ("t = toss the dice | p = pick a number manually from [1-6] | x = exit game")
         isToss <- getLine
         if isToss == "x"
           then exit
@@ -71,18 +71,18 @@ person_play state numselection whostart =
               putStrLn ("You tossed "++show numTossed)
               let newState = (computerstate, playerstate ++ [numTossed]) 
                in computer_play newState (numselection-1) whostart
-          else
-            person_play state numselection whostart
-          -- if (not(numpicked `elem` ["1","2","3","4","5","6"]))
-          --   then 
-            
-          -- else
-          --   let numpickedint = read numpicked :: Int
-          --       newState = (computerstate, playerstate ++ [numpickedint])
-          --   in computer_play newState (numselection-1) whostart
-    
-
-
+        else
+           do
+              putStrLn ("Pick a Number from 1 to 6 ")
+              numpicked <- getLine
+              putStrLn ("You picked "++show numpicked)
+              if (not(numpicked `elem` ["1","2","3","4","5","6"]))
+                then person_play state numselection whostart
+              else
+                let numpickedint = read numpicked :: Int
+                    newState = (computerstate, playerstate ++ [numpickedint]) 
+                    in computer_play newState (numselection-1) whostart
+     
 computer_play :: (Ord a, Show a, Num a) => ([Int], [Int]) -> a -> [Char] -> IO ()
 computer_play state numselection whostart =
   do
@@ -114,10 +114,8 @@ endgame state =
     putStrLn ("***************************")
     putStrLn("****** Bingo stars earned: you = " ++ show playertotalbingo ++ " | Computer = " ++ show computertotalbingo ++ " ******")
     putStrLn ("***************************")
-    putStrLn ("Bingo board")
-    putStrLn (show (getCondsStringByRow 1))
-    putStrLn (show (getCondsStringByRow 2))
-    putStrLn (show (getCondsStringByRow 3))
+    putStrLn ("Here is the Bingo Card you played")
+    putStrLn (getBingoCard)
     putStrLn ("================================")
     putStrLn ("p = play again | other key = exit game")
 
