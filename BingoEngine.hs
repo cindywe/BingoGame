@@ -9,8 +9,8 @@ module BingoEngine
    ) where
 
 import Data.Map (fromListWith, toList) 
-import Data.List (intercalate, intersperse, transpose)
-import Prelude hiding (Left, Right)
+
+import Tablefy
 
 
 -- getTotalBingo returns the total number of Bingo
@@ -49,38 +49,7 @@ condR3C3 = "get '6' more than once"
 
 getBingoCard = tablefy [" ","BingoCard"," "] [[condR1C1,condR1C2,condR1C3],[condR2C1,condR2C2,condR2C3],[condR3C1,condR3C2,condR3C3]]
 
-tablefy h rs
-    | any (/= length h) (map length rs) = error "Tablefy.tablefy: Differences in length"
-    | otherwise                         = table
-    where
-        table  = unlines $ insert' sep (header:rows)
-        widths = map (maximum . map length) (transpose (h:rs))
-        sep    = insert "+" $ map (flip replicate '-' . (+2)) widths
-        header = mkRow Center h
-        rows   = map (mkRow Left) rs
-        mkRow a       = insert "|" . zipWith (mkCell a) widths
-        mkCell a n xs = " " ++ pad a n ' ' xs ++ " "
-insert :: [a] -> [[a]] -> [a]
-insert x xs = intercalate x ([] : xs ++ [[]])
 
--- | Version of 'insert' that uses 'intersperse' instead of 'intercalate'.
---
---   >>> insert' "#" ["Alpha","Beta","Gamma"]
---   >>> ["#", "Alpha", "#", "Beta", "#", "Gamma", "#"]
-insert' :: [a] -> [[a]] -> [[a]]
-insert' x xs = intersperse x ([] : xs ++ [[]])
-
--- | Alignment is a simple sum type containing the different modes of padding.
-data Alignment = Left | Right | Center deriving Eq
-
-pad :: Alignment -> Int -> a -> [a] -> [a]
-pad a n x xs
-    | n < 1          = error "Tablefy.pad: Length must not be smaller than one"
-    | n <= length xs = take n xs
-    | a == Left      = xs ++ replicate (n - length xs) x
-    | a == Right     = replicate (n - length xs) x ++ xs
-    | a == Center    = let (space, extra) = quotRem (n - length xs) 2
-                       in replicate space x ++ xs ++ replicate (space + extra) x
 -- Check if getting '1' exactly once
 -- input: list of dice rolling result/selected numbers
 check_condR1C1 :: (Eq a, Num a) => [a] -> Bool
