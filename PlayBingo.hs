@@ -73,21 +73,16 @@ person_play state numselection whostart =
               putStrLn ("You tossed "++show numTossed)
               let newState = (computerstate, playerstate ++ [numTossed]) 
                in computer_play newState (numselection-1) whostart
-          else
-            if isToss == "p"
-              then 
-                if
-            person_play state numselection whostart
-          -- if (not(numpicked `elem` ["1","2","3","4","5","6"]))
-          --   then 
-            
-          -- else
-          --   let numpickedint = read numpicked :: Int
-          --       newState = (computerstate, playerstate ++ [numpickedint])
-          --   in computer_play newState (numselection-1) whostart
-    
-
-
+        else
+           do
+              numpicked <- getLine
+              if (not(numpicked `elem` ["1","2","3","4","5","6"]))
+                then person_play state numselection whostart
+              else
+                let numpickedint = read numpicked :: Int
+                    newState = (computerstate, playerstate ++ [numpickedint]) 
+                    in computer_play newState (numselection-1) whostart
+     
 computer_play :: (Ord a, Show a, Num a) => ([Int], [Int]) -> a -> [Char] -> IO ()
 computer_play state numselection whostart =
   do
