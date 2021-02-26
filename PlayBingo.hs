@@ -73,7 +73,9 @@ person_play state numselection whostart =
                in computer_play newState (numselection-1) whostart
         else
            do
+              putStrLn ("Pick a Number from 1 to 6 ")
               numpicked <- getLine
+              putStrLn ("You picked "++show numpicked)
               if (not(numpicked `elem` ["1","2","3","4","5","6"]))
                 then person_play state numselection whostart
               else
