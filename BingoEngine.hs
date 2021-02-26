@@ -2,7 +2,9 @@
 
 module BingoEngine
   (getTotalBingo,
-   getMatchedCells
+   getMatchedCells,
+   allCondsString,
+   getCondsStringByRow
    ) where
 
 import Data.Map (fromListWith, toList)
@@ -19,19 +21,18 @@ getTotalBingo dicerollresult =
 -- input: list of dice rolling result/selected numbers
 getMatchedCells :: [Int] -> [[Char]]
 getMatchedCells [] = []
-getMatchedCells dicerollresult = [getCellByIdx idx | idx <- (extractIndexOfMatchConds (checkCond allConds matchedCondWithIdx dicerollresult))]
+getMatchedCells dicerollresult = [allCondsString !! idx | idx <- (extractIndexOfMatchConds (checkCond allConds matchedCondWithIdx dicerollresult))]
 
--- all conditions
-condR1C1 = "get '1' exactly once"
-condR1C2 = "get odd number more than 4 times"
-condR1C3 = "get even number at least once"
-condR2C1 = "get same number at least three times"
-condR2C2 = "get multiples of 3 at least twice"
-condR2C3 = "get sum of more than 20"
-condR3C1 = "get two sequential numbers at least twice"
-condR3C2 = "get prime number more than twice"
-condR3C3 = "get '6' more than once"
 
+allCondsString = 
+    ["get '1' exactly once", "get odd number more than 4 times", "get even number at least once", 
+    "get same number at least three times", "get multiples of 3 at least twice", "get sum of more than 20", 
+    "get two sequential numbers at least twice", "get prime number more than twice", "get '6' more than once"]
+
+getCondsStringByRow rowIdx = [allCondsString !! (((rowIdx - 1) * 3) + col) | col <- [0..2]]
+
+allConds :: [[Int] -> Bool]
+allConds = [check_condR1C1, check_condR1C2, check_condR1C3, check_condR2C1, check_condR2C2, check_condR2C3, check_condR3C1, check_condR3C2, check_condR3C3]
 
 -- Check if getting '1' exactly once
 -- input: list of dice rolling result/selected numbers
@@ -112,9 +113,6 @@ get_pair_adjacent_num :: [b] -> [(b, b)]
 get_pair_adjacent_num (h:t) = zip (h:t) t
 
 
-allConds :: [[Int] -> Bool]
-allConds = [check_condR1C1, check_condR1C2, check_condR1C3, check_condR2C1, check_condR2C2, check_condR2C3, check_condR3C1, check_condR3C2, check_condR3C3]
-
 -- matchedResultWithIdx contains matched results for all conditions/cells.
 -- First element of the tuple is the matched result (True = matched, False = not matched)
 -- Second element of the tuple is the index of the condition in allConds
@@ -171,13 +169,13 @@ checkCol matchedCondBool rowIdx colIdx = (matchedCondBool !! (translateCellToIdx
 -- input: list of booleans indicating the matched result for each condition
 checkDiagonalDown :: [Bool] -> Int -> Int -> Bool
 checkDiagonalDown _ 4 4 = True
-checkDiagonalDown matchedCondBool rowIdx colIdx = (matchedCondBool !! (translateCellToIdx rowIdx colIdx)) && (checkCol matchedCondBool (rowIdx+1) (colIdx+1))
+checkDiagonalDown matchedCondBool rowIdx colIdx = (matchedCondBool !! (translateCellToIdx rowIdx colIdx)) && (checkDiagonalDown matchedCondBool (rowIdx+1) (colIdx+1))
 
 -- check if all conditions/cells in the diagonal (row3 col1, row2 col2, row1, col3) are matched
 -- input: list of booleans indicating the matched result for each condition
 checkDiagonalUp :: [Bool] -> Int -> Int -> Bool
 checkDiagonalUp _ 1 4 = True
-checkDiagonalUp matchedCondBool rowIdx colIdx = (matchedCondBool !! (translateCellToIdx rowIdx colIdx)) && (checkCol matchedCondBool (rowIdx-1) (colIdx+1))
+checkDiagonalUp matchedCondBool rowIdx colIdx = (matchedCondBool !! (translateCellToIdx rowIdx colIdx)) && (checkDiagonalUp matchedCondBool (rowIdx-1) (colIdx+1))
 
 
 
