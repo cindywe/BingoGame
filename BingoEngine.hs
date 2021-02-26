@@ -2,10 +2,15 @@
 
 module BingoEngine
   (getTotalBingo,
-   getMatchedCells
+   getMatchedCells,
+   allCondsString,
+   getCondsStringByRow,
+   getBingoCard
    ) where
 
-import Data.Map (fromListWith, toList)
+import Data.Map (fromListWith, toList) 
+import Data.List (intercalate, intersperse, transpose)
+import Prelude hiding (Left, Right)
 
 
 -- getTotalBingo returns the total number of Bingo
@@ -19,9 +24,19 @@ getTotalBingo dicerollresult =
 -- input: list of dice rolling result/selected numbers
 getMatchedCells :: [Int] -> [[Char]]
 getMatchedCells [] = []
-getMatchedCells dicerollresult = [getCellByIdx idx | idx <- (extractIndexOfMatchConds (checkCond allConds matchedCondWithIdx dicerollresult))]
+getMatchedCells dicerollresult = [allCondsString !! idx | idx <- (extractIndexOfMatchConds (checkCond allConds matchedCondWithIdx dicerollresult))]
 
--- all conditions
+
+allCondsString = 
+    ["get '1' exactly once", "get odd number more than 4 times", "get even number at least once", 
+    "get same number at least three times", "get multiples of 3 at least twice", "get sum of more than 20", 
+    "get two sequential numbers at least twice", "get prime number more than twice", "get '6' more than once"]
+
+getCondsStringByRow rowIdx = [allCondsString !! (((rowIdx - 1) * 3) + col) | col <- [0..2]]
+
+allConds :: [[Int] -> Bool]
+allConds = [check_condR1C1, check_condR1C2, check_condR1C3, check_condR2C1, check_condR2C2, check_condR2C3, check_condR3C1, check_condR3C2, check_condR3C3]
+
 condR1C1 = "get '1' exactly once"
 condR1C2 = "get odd number more than 4 times"
 condR1C3 = "get even number at least once"
@@ -32,7 +47,40 @@ condR3C1 = "get two sequential numbers at least twice"
 condR3C2 = "get prime number more than twice"
 condR3C3 = "get '6' more than once"
 
+getBingoCard = tablefy [" ","BingoCard"," "] [[condR1C1,condR1C2,condR1C3],[condR2C1,condR2C2,condR2C3],[condR3C1,condR3C2,condR3C3]]
 
+tablefy h rs
+    | any (/= length h) (map length rs) = error "Tablefy.tablefy: Differences in length"
+    | otherwise                         = table
+    where
+        table  = unlines $ insert' sep (header:rows)
+        widths = map (maximum . map length) (transpose (h:rs))
+        sep    = insert "+" $ map (flip replicate '-' . (+2)) widths
+        header = mkRow Center h
+        rows   = map (mkRow Left) rs
+        mkRow a       = insert "|" . zipWith (mkCell a) widths
+        mkCell a n xs = " " ++ pad a n ' ' xs ++ " "
+insert :: [a] -> [[a]] -> [a]
+insert x xs = intercalate x ([] : xs ++ [[]])
+
+-- | Version of 'insert' that uses 'intersperse' instead of 'intercalate'.
+--
+--   >>> insert' "#" ["Alpha","Beta","Gamma"]
+--   >>> ["#", "Alpha", "#", "Beta", "#", "Gamma", "#"]
+insert' :: [a] -> [[a]] -> [[a]]
+insert' x xs = intersperse x ([] : xs ++ [[]])
+
+-- | Alignment is a simple sum type containing the different modes of padding.
+data Alignment = Left | Right | Center deriving Eq
+
+pad :: Alignment -> Int -> a -> [a] -> [a]
+pad a n x xs
+    | n < 1          = error "Tablefy.pad: Length must not be smaller than one"
+    | n <= length xs = take n xs
+    | a == Left      = xs ++ replicate (n - length xs) x
+    | a == Right     = replicate (n - length xs) x ++ xs
+    | a == Center    = let (space, extra) = quotRem (n - length xs) 2
+                       in replicate space x ++ xs ++ replicate (space + extra) x
 -- Check if getting '1' exactly once
 -- input: list of dice rolling result/selected numbers
 check_condR1C1 :: (Eq a, Num a) => [a] -> Bool
@@ -112,9 +160,6 @@ get_pair_adjacent_num :: [b] -> [(b, b)]
 get_pair_adjacent_num (h:t) = zip (h:t) t
 
 
-allConds :: [[Int] -> Bool]
-allConds = [check_condR1C1, check_condR1C2, check_condR1C3, check_condR2C1, check_condR2C2, check_condR2C3, check_condR3C1, check_condR3C2, check_condR3C3]
-
 -- matchedResultWithIdx contains matched results for all conditions/cells.
 -- First element of the tuple is the matched result (True = matched, False = not matched)
 -- Second element of the tuple is the index of the condition in allConds
@@ -171,13 +216,11 @@ checkCol matchedCondBool rowIdx colIdx = (matchedCondBool !! (translateCellToIdx
 -- input: list of booleans indicating the matched result for each condition
 checkDiagonalDown :: [Bool] -> Int -> Int -> Bool
 checkDiagonalDown _ 4 4 = True
-checkDiagonalDown matchedCondBool rowIdx colIdx = (matchedCondBool !! (translateCellToIdx rowIdx colIdx)) && (checkCol matchedCondBool (rowIdx+1) (colIdx+1))
+checkDiagonalDown matchedCondBool rowIdx colIdx = (matchedCondBool !! (translateCellToIdx rowIdx colIdx)) && (checkDiagonalDown matchedCondBool (rowIdx+1) (colIdx+1))
 
 -- check if all conditions/cells in the diagonal (row3 col1, row2 col2, row1, col3) are matched
 -- input: list of booleans indicating the matched result for each condition
 checkDiagonalUp :: [Bool] -> Int -> Int -> Bool
-checkDiagonalUp _ 1 4 = True
-checkDiagonalUp matchedCondBool rowIdx colIdx = (matchedCondBool !! (translateCellToIdx rowIdx colIdx)) && (checkCol matchedCondBool (rowIdx-1) (colIdx+1))
-
-
+checkDiagonalUp _ 0 4 = True
+checkDiagonalUp matchedCondBool rowIdx colIdx = (matchedCondBool !! (translateCellToIdx rowIdx colIdx)) && (checkDiagonalUp matchedCondBool (rowIdx-1) (colIdx+1))
 

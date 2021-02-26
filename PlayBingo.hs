@@ -27,7 +27,7 @@ start =
 play :: ([Int], [Int]) -> IO ()
 play state =
   do
-    putStrLn ("How many number do you want to select?")
+    putStrLn ("How many rounds do you want to play?")
     putStrLn ("5 | 10 | 15")
     numselection <- getLine
     if(not(numselection `elem` ["5","10","15"]))
@@ -56,13 +56,11 @@ person_play state numselection whostart =
     else
       do
         putStrLn ("--------------------------")
-        putStrLn ("You've picked: " ++ show playerstate)
-        putStrLn ("You've matched: " ++ show playermatchedcells)
-        putStrLn ("Computer's picked: " ++ show computerstate)
-        putStrLn ("Computer's matched: " ++ show computermatchedcells)
+        putStrLn (get_player_state_string playerstate playermatchedcells)
+        putStrLn (get_computer_state_string computerstate computermatchedcells)
         putStrLn ("--------------------------")
         putStrLn ("# selection remains: " ++ show numselection)
-        putStrLn ("t = toss the dice | x = exit game")
+        putStrLn ("t = toss the dice | p = pick a number manually from [1-6] | x = exit game")
         isToss <- getLine
         if isToss == "x"
           then exit
@@ -73,18 +71,18 @@ person_play state numselection whostart =
               putStrLn ("You tossed "++show numTossed)
               let newState = (computerstate, playerstate ++ [numTossed]) 
                in computer_play newState (numselection-1) whostart
-          else
-            person_play state numselection whostart
-          -- if (not(numpicked `elem` ["1","2","3","4","5","6"]))
-          --   then 
-            
-          -- else
-          --   let numpickedint = read numpicked :: Int
-          --       newState = (computerstate, playerstate ++ [numpickedint])
-          --   in computer_play newState (numselection-1) whostart
-    
-
-
+        else
+           do
+              putStrLn ("Pick a Number from 1 to 6 ")
+              numpicked <- getLine
+              putStrLn ("You picked "++show numpicked)
+              if (not(numpicked `elem` ["1","2","3","4","5","6"]))
+                then person_play state numselection whostart
+              else
+                let numpickedint = read numpicked :: Int
+                    newState = (computerstate, playerstate ++ [numpickedint]) 
+                    in computer_play newState (numselection-1) whostart
+     
 computer_play :: (Ord a, Show a, Num a) => ([Int], [Int]) -> a -> [Char] -> IO ()
 computer_play state numselection whostart =
   do
@@ -106,11 +104,18 @@ endgame state =
   do
     let playerstate = snd state
         computerstate = fst state 
+        playermatchedcells = getMatchedCells playerstate
+        computermatchedcells = getMatchedCells computerstate
         playertotalbingo = getTotalBingo playerstate
         computertotalbingo = getTotalBingo computerstate
-    putStrLn("Selected numbers: you = " ++ show playerstate ++ " | computer = " ++ show computerstate)
-    putStrLn ("================================")
-    putStrLn("****** Bingo stars earned: you = " ++ show playertotalbingo ++ " | computer = " ++ show computertotalbingo ++ " ******")
+    putStrLn ("--------------------------")
+    putStrLn (get_player_state_string playerstate playermatchedcells)
+    putStrLn (get_computer_state_string computerstate computermatchedcells)
+    putStrLn ("***************************")
+    putStrLn("****** Bingo stars earned: you = " ++ show playertotalbingo ++ " | Computer = " ++ show computertotalbingo ++ " ******")
+    putStrLn ("***************************")
+    putStrLn ("Here is the Bingo Card you played")
+    putStrLn (getBingoCard)
     putStrLn ("================================")
     putStrLn ("p = play again | other key = exit game")
 
@@ -121,5 +126,20 @@ endgame state =
 
 
 exit = putStrLn ("Bye, see you again!!!")
+
+get_player_state_string state matchedcells = "Your numbers: " ++ show state ++ "\nYou've matched: " ++ show matchedcells
+
+get_computer_state_string state matchedcells = "Computers's numbers: " ++ show state ++ "\nComputer's matched: " ++ show matchedcells
+
+
+
+
+
+
+
+
+
+
+
 
 
