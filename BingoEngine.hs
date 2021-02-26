@@ -4,8 +4,8 @@ module BingoEngine
   (getTotalBingo,
    getMatchedCells,
    allCondsString,
-   getCondsStringByRow
-   -- bingoCard
+   getCondsStringByRow,
+   getBingoCard
    ) where
 
 import Data.Map (fromListWith, toList) 
@@ -37,7 +37,17 @@ getCondsStringByRow rowIdx = [allCondsString !! (((rowIdx - 1) * 3) + col) | col
 allConds :: [[Int] -> Bool]
 allConds = [check_condR1C1, check_condR1C2, check_condR1C3, check_condR2C1, check_condR2C2, check_condR2C3, check_condR3C1, check_condR3C2, check_condR3C3]
 
--- bingoCard = tablefy ["BingoCard"," "," "] [[condR1C1,condR1C2,condR1C3],[condR2C1,condR2C2,condR2C3],[condR3C1,condR3C2,condR3C3]]
+condR1C1 = "get '1' exactly once"
+condR1C2 = "get odd number more than 4 times"
+condR1C3 = "get even number at least once"
+condR2C1 = "get same number at least three times"
+condR2C2 = "get multiples of 3 at least twice"
+condR2C3 = "get sum of more than 20"
+condR3C1 = "get two sequential numbers at least twice"
+condR3C2 = "get prime number more than twice"
+condR3C3 = "get '6' more than once"
+
+getBingoCard = tablefy [" ","BingoCard"," "] [[condR1C1,condR1C2,condR1C3],[condR2C1,condR2C2,condR2C3],[condR3C1,condR3C2,condR3C3]]
 
 tablefy h rs
     | any (/= length h) (map length rs) = error "Tablefy.tablefy: Differences in length"
@@ -214,19 +224,3 @@ checkDiagonalUp :: [Bool] -> Int -> Int -> Bool
 checkDiagonalUp _ 0 4 = True
 checkDiagonalUp matchedCondBool rowIdx colIdx = (matchedCondBool !! (translateCellToIdx rowIdx colIdx)) && (checkDiagonalUp matchedCondBool (rowIdx-1) (colIdx+1))
 
-
-
--- pad width x = x ++ replicate k ' '
---    where k = width - length x
-
--- fmt_column :: [String] -> Box
--- fmt_column items = hsep // vcat left (intersperse hsep (map (text.pad width) items)) // hsep
---     where width = maximum $ map length items
---           hsep = text ( replicate width '-' )
-
--- table :: [[String]] -> Box
--- table rows = vsep <> hcat top (intersperse vsep (map fmt_column columns)) <> vsep
---  where
---     columns = transpose rows
---     nrows = length rows
---     vsep =  vcat left $ map char ("+" ++ (concat $ replicate nrows "|+")) 
