@@ -117,6 +117,9 @@ endgame state =
     putStrLn (show (getCondsStringByRow 2))
     putStrLn (show (getCondsStringByRow 3))
     putStrLn ("================================")
+    putStrLn ("Here is the Bingo Card you played")
+    putStrLn (bingoCard)
+    putStrLn ("================================")
     putStrLn ("p = play again | other key = exit game")
 
     line <- getLine
