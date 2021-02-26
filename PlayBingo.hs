@@ -110,6 +110,9 @@ endgame state =
     putStrLn ("================================")
     putStrLn("****** Bingo stars earned: you = " ++ show playertotalbingo ++ " | computer = " ++ show computertotalbingo ++ " ******")
     putStrLn ("================================")
+    putStrLn ("Here is the Bingo Card you played")
+    putStrLn (bingoCard)
+    putStrLn ("================================")
     putStrLn ("p = play again | other key = exit game")
 
     line <- getLine
