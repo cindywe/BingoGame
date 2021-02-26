@@ -27,7 +27,7 @@ start =
 play :: ([Int], [Int]) -> IO ()
 play state =
   do
-    putStrLn ("How many number do you want to select?")
+    putStrLn ("How many rounds do you want to play?")
     putStrLn ("5 | 10 | 15")
     numselection <- getLine
     if(not(numselection `elem` ["5","10","15"]))
@@ -56,12 +56,10 @@ person_play state numselection whostart =
     else
       do
         putStrLn ("--------------------------")
-        putStrLn ("You've picked: " ++ show playerstate)
-        putStrLn ("You've matched: " ++ show playermatchedcells)
-        putStrLn ("Computer's picked: " ++ show computerstate)
-        putStrLn ("Computer's matched: " ++ show computermatchedcells)
+        putStrLn (get_player_state_string playerstate playermatchedcells)
+        putStrLn (get_computer_state_string computerstate computermatchedcells)
         putStrLn ("--------------------------")
-        putStrLn ("# selection remains: " ++ show numselection)
+        putStrLn ("# round remains: " ++ show numselection)
         putStrLn ("t = toss the dice | x = exit game")
         isToss <- getLine
         if isToss == "x"
@@ -106,11 +104,20 @@ endgame state =
   do
     let playerstate = snd state
         computerstate = fst state 
+        playermatchedcells = getMatchedCells playerstate
+        computermatchedcells = getMatchedCells computerstate
         playertotalbingo = getTotalBingo playerstate
         computertotalbingo = getTotalBingo computerstate
-    putStrLn("Selected numbers: you = " ++ show playerstate ++ " | computer = " ++ show computerstate)
-    putStrLn ("================================")
-    putStrLn("****** Bingo stars earned: you = " ++ show playertotalbingo ++ " | computer = " ++ show computertotalbingo ++ " ******")
+    putStrLn ("--------------------------")
+    putStrLn (get_player_state_string playerstate playermatchedcells)
+    putStrLn (get_computer_state_string computerstate computermatchedcells)
+    putStrLn ("***************************")
+    putStrLn("****** Bingo stars earned: you = " ++ show playertotalbingo ++ " | Computer = " ++ show computertotalbingo ++ " ******")
+    putStrLn ("***************************")
+    putStrLn ("Bingo board")
+    putStrLn (show (getCondsStringByRow 1))
+    putStrLn (show (getCondsStringByRow 2))
+    putStrLn (show (getCondsStringByRow 3))
     putStrLn ("================================")
     putStrLn ("p = play again | other key = exit game")
 
@@ -121,5 +128,20 @@ endgame state =
 
 
 exit = putStrLn ("Bye, see you again!!!")
+
+get_player_state_string state matchedcells = "Your numbers: " ++ show state ++ "\nYou've matched: " ++ show matchedcells
+
+get_computer_state_string state matchedcells = "Computers's numbers: " ++ show state ++ "\nComputer's matched: " ++ show matchedcells
+
+
+
+
+
+
+
+
+
+
+
 
 
