@@ -174,7 +174,7 @@ checkDiagonalDown matchedCondBool rowIdx colIdx = (matchedCondBool !! (translate
 -- check if all conditions/cells in the diagonal (row3 col1, row2 col2, row1, col3) are matched
 -- input: list of booleans indicating the matched result for each condition
 checkDiagonalUp :: [Bool] -> Int -> Int -> Bool
-checkDiagonalUp _ 1 4 = True
+checkDiagonalUp _ 0 4 = True
 checkDiagonalUp matchedCondBool rowIdx colIdx = (matchedCondBool !! (translateCellToIdx rowIdx colIdx)) && (checkDiagonalUp matchedCondBool (rowIdx-1) (colIdx+1))
 
 
